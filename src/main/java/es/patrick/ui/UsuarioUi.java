@@ -3,7 +3,9 @@ package es.patrick.ui;
 import es.patrick.domain.dto.UsuarioDTO;
 import es.patrick.domain.services.UsuarioService;
 import jakarta.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class UsuarioUi {
     private final UsuarioService usuarioService;
 
@@ -27,6 +29,7 @@ public class UsuarioUi {
             boolean ok = usuarioService.login(credenciales);
             if (ok) {
                 IO.println("Bienvenido al sistema.");
+                log.info("Bienvenido al sistema.");
                 break;
             } else {
                 IO.println("Credenciales incorrectas, inténtalo de nuevo. ");
