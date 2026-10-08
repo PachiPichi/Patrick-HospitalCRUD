@@ -1,6 +1,6 @@
 package es.patrick.ui;
 
-import es.patrick.dao.model.Usuario;
+import es.patrick.domain.dto.UsuarioDTO;
 import es.patrick.domain.services.UsuarioService;
 import jakarta.inject.Inject;
 
@@ -11,7 +11,7 @@ public class UsuarioUi {
     public UsuarioUi(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
-    public static void login() {
+    public void login() {
         IO.println("Por favor, introduzca sus credenciales: ");
 
         while (true) {
@@ -22,8 +22,15 @@ public class UsuarioUi {
             IO.println("Contraseña: ");
             String password = IO.readln();
             if (password.isEmpty()) continue;
-            Usuario credenciales = new Usuario(username, password);
+            UsuarioDTO credenciales = new UsuarioDTO(username, password);
 
+            boolean ok = usuarioService.login(credenciales);
+            if (ok) {
+                IO.println("Bienvenido al sistema.");
+                break;
+            } else {
+                IO.println("Credenciales incorrectas, inténtalo de nuevo. ");
+            }
 
         }
     }

@@ -1,7 +1,7 @@
 package es.patrick.domain.services;
 
-import es.patrick.dao.model.Usuario;
 import es.patrick.dao.repositories.UsuarioRepository;
+import es.patrick.domain.dto.UsuarioDTO;
 import jakarta.inject.Inject;
 
 public class UsuarioService {
@@ -11,7 +11,7 @@ public class UsuarioService {
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
-    public boolean login(Usuario usuario) {
+    public boolean login(UsuarioDTO usuario) {
         return usuarioRepository.findByUsername(usuario.getUsername())
                 .map(u -> u.getUsername().equals(usuario.getUsername())
                 && u.getPassword().equals(usuario.getPassword()))

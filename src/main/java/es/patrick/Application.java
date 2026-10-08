@@ -8,7 +8,7 @@ public class Application {
     static void main() {
         try (SeContainer container = SeContainerInitializer.newInstance().initialize()) {
             MainMenu mainMenu = container.select(MainMenu.class).get();
-            MainMenu.run();
+            mainMenu.run();
 
         }
     }

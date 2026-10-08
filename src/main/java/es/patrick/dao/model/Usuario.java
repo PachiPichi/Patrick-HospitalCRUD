@@ -1,11 +1,17 @@
 package es.patrick.dao.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@ToString
 @AllArgsConstructor
 public class Usuario {
+    private Long id;
     private String username;
     private String password;
+    private Long pacienteId;
+    private Long medicoId;
 }
