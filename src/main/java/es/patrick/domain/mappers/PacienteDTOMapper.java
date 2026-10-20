@@ -2,7 +2,6 @@ package es.patrick.domain.mappers;
 
 import es.patrick.dao.model.Paciente;
 import es.patrick.domain.dto.PacienteDTO;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,9 +25,7 @@ public class PacienteDTOMapper
     public List<PacienteDTO> toDTOList(List<Paciente> pacientes) {
 
         List<PacienteDTO> listaDtos = new ArrayList<>();
-        for (Paciente paciente : pacientes)  {
-            listaDtos.add(toDTO(paciente));
-        }
+        pacientes.forEach(paciente -> listaDtos.add(toDTO(paciente)));
         return listaDtos;
     }
 
