@@ -9,10 +9,7 @@ import es.patrick.domain.error.DatabaseError;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,5 +41,30 @@ public class JDBCPacienteRepository implements PacienteRepository {
             throw new DatabaseError(e.getMessage());
         }
         return pacientes;
+    }
+
+    @Override
+    public Long add(Paciente paciente) {
+        try (Connection conn = dbConnection.getConnection();
+        PreparedStatement pstmtPaciente = conn.prepareStatement(SQLQueries.ADD_PACIENTE, Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement pstmtUsuario = conn.prepareStatement(SQLQueries.ADD_USUARIO)){
+            try {
+                conn.setAutoCommit(false);
+                pstmtPaciente.setString(1, paciente.getNombre());
+                pstmtPaciente.setDate(2, Date.valueOf(paciente.getFechaNacimiento()));
+                pstmtPaciente.setString(3, paciente.getTelefono());
+
+                int filasAfectadas = pstmtPaciente.executeUpdate();
+
+                if (filasAfectadas > 0) {
+                    ResultSet idsGenerados = pstmtPaciente.getGeneratedKeys();
+                    if (idsGenerados.next()){
+                        paciente.setId(idsGenerados.getLong(1));
+                        pstmtUsuario.Set
+                    }
+                }
+            }
+
+        }
     }
 }
