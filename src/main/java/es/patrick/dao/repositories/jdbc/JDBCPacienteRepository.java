@@ -1,11 +1,13 @@
 package es.patrick.dao.repositories.jdbc;
 
+import es.patrick.common.Constantes;
 import es.patrick.dao.common.SQLQueries;
 import es.patrick.dao.mappers.PacienteRowMapper;
 import es.patrick.dao.model.Paciente;
 import es.patrick.dao.repositories.PacienteRepository;
 import es.patrick.dao.utils.DBConnection;
 import es.patrick.domain.error.DatabaseError;
+import es.patrick.domain.error.PacienteDuplicadoError;
 import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -60,11 +62,29 @@ public class JDBCPacienteRepository implements PacienteRepository {
                     ResultSet idsGenerados = pstmtPaciente.getGeneratedKeys();
                     if (idsGenerados.next()){
                         paciente.setId(idsGenerados.getLong(1));
-                        pstmtUsuario.Set
+                        pstmtUsuario.setString(1, paciente.getUsuario().getUsername());
+                        pstmtUsuario.setString(2, paciente.getUsuario().getPassword());
+                        pstmtUsuario.setLong(3, paciente.getId());
+                        pstmtUsuario.executeUpdate();
+                        conn.commit();
                     }
                 }
+                return paciente.getId();
+            } catch (SQLIntegrityConstraintViolationException e) {
+                conn.rollback();
+                log.error(e.getMessage());
+                throw new PacienteDuplicadoError();
+            } catch (SQLException e) {
+                conn.rollback();
+                log.error(e.getMessage());
+                throw new DatabaseError(Constantes.DATABASE_ERROR);
+            } finally {
+                conn.setAutoCommit(true);
             }
 
+        } catch (SQLException e){
+            log.error(e.getMessage());
+            throw new DatabaseError(Constantes.DATABASE_ERROR);
         }
     }
 }

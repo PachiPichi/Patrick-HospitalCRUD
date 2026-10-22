@@ -1,7 +1,6 @@
 package es.patrick.domain.mappers;
 
 import es.patrick.dao.model.Paciente;
-import es.patrick.domain.dto.PacienteDTO;
 import java.util.ArrayList;
 import java.util.List;
 
