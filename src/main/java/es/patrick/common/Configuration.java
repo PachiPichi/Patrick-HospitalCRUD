@@ -16,7 +16,7 @@ public class Configuration {
         p = new Properties();
         try {
             InputStream propertiesStream =
-                    getClass().getClassLoader().getResourceAsStream("MYSQL_PROPERTIES");
+                    getClass().getClassLoader().getResourceAsStream(Constantes.MYSQL_PROPERTIES);
             p.loadFromXML(propertiesStream);
         } catch (IOException e) {
             log.error("Error cargando fichero de propiedades: {}", e.getMessage());

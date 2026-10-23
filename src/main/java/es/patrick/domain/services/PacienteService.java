@@ -2,6 +2,7 @@ package es.patrick.domain.services;
 
 import es.patrick.dao.repositories.PacienteRepository;
 import es.patrick.domain.dto.PacienteDTO;
+import es.patrick.domain.dto.PacienteDTOAlta;
 import es.patrick.domain.mappers.PacienteDTOMapper;
 import jakarta.inject.Inject;
 
@@ -19,5 +20,9 @@ public class PacienteService {
 
     public List<PacienteDTO> getAll() {
         return pacienteDTOMapper.toDTOList(pacienteRepository.findAll());
+    }
+
+    public Long add(PacienteDTOAlta pacienteDTO) {
+        return pacienteRepository.add(pacienteDTOMapper.toEntity(pacienteDTO));
     }
 }

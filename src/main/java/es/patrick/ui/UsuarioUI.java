@@ -6,24 +6,30 @@ import jakarta.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class UsuarioUi {
+public class UsuarioUI {
     private final UsuarioService usuarioService;
 
     @Inject
-    public UsuarioUi(UsuarioService usuarioService) {
+    public UsuarioUI(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
     }
     public void login() {
+
+        final int MAX_INTENTOS = 3;
+        int intento = 0;
         IO.println("Por favor, introduzca sus credenciales: ");
 
-        while (true) {
-            IO.println("Usuario: ");
-            String username = IO.readln();
-            if (username.isEmpty()) continue;
+        while (intento < MAX_INTENTOS) {
+            IO.println("Usuario (0 para salir): ");
+            String username = IO.readln().trim();
+            if (username.equals("0")) { return;}
 
             IO.println("Contraseña: ");
             String password = IO.readln();
-            if (password.isEmpty()) continue;
+            if (password.isEmpty() || username.isEmpty()) {
+                IO.println("Por favor, introduzca sus credenciales");
+                continue;
+            }
             UsuarioDTO credenciales = new UsuarioDTO(username, password);
 
             boolean ok = usuarioService.login(credenciales);
@@ -33,8 +39,11 @@ public class UsuarioUi {
                 break;
             } else {
                 IO.println("Credenciales incorrectas, inténtalo de nuevo. ");
+                intento++;
             }
 
+
         }
+        IO.println("Has superado el número de intentos");
     }
 }
