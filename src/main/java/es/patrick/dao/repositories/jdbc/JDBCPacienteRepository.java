@@ -46,10 +46,27 @@ public class JDBCPacienteRepository implements PacienteRepository {
     }
 
     @Override
+    public Paciente findById(Long id) {
+        try (Connection connection = dbConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.FIND_PACIENTE_BY_ID)) {
+            preparedStatement.setLong(1, id);
+            try (ResultSet rs = preparedStatement.executeQuery()) {
+                if (rs.next()) {
+                    return pacienteRowMapper.mapRow(rs, rs.getRow());
+                }
+                return null;
+            }
+        } catch (SQLException e) {
+            log.error("Se ha producido un error en la BD al buscar paciente por id", e);
+            throw new DatabaseError(Constantes.DATABASE_ERROR);
+        }
+    }
+
+    @Override
     public Long add(Paciente paciente) {
         try (Connection conn = dbConnection.getConnection();
-        PreparedStatement pstmtPaciente = conn.prepareStatement(SQLQueries.ADD_PACIENTE, Statement.RETURN_GENERATED_KEYS);
-        PreparedStatement pstmtUsuario = conn.prepareStatement(SQLQueries.ADD_USUARIO)){
+             PreparedStatement pstmtPaciente = conn.prepareStatement(SQLQueries.ADD_PACIENTE, Statement.RETURN_GENERATED_KEYS);
+             PreparedStatement pstmtUsuario = conn.prepareStatement(SQLQueries.ADD_USUARIO)) {
             try {
                 conn.setAutoCommit(false);
                 pstmtPaciente.setString(1, paciente.getNombre());
@@ -60,7 +77,7 @@ public class JDBCPacienteRepository implements PacienteRepository {
 
                 if (filasAfectadas > 0) {
                     ResultSet idsGenerados = pstmtPaciente.getGeneratedKeys();
-                    if (idsGenerados.next()){
+                    if (idsGenerados.next()) {
                         paciente.setId(idsGenerados.getLong(1));
                         pstmtUsuario.setString(1, paciente.getUsuario().getUsername());
                         pstmtUsuario.setString(2, paciente.getUsuario().getPassword());
@@ -82,8 +99,48 @@ public class JDBCPacienteRepository implements PacienteRepository {
                 conn.setAutoCommit(true);
             }
 
-        } catch (SQLException e){
+        } catch (SQLException e) {
             log.error(e.getMessage());
+            throw new DatabaseError(Constantes.DATABASE_ERROR);
+        }
+    }
+
+    @Override
+    public boolean update(Paciente paciente) {
+        try (Connection connection = dbConnection.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQLQueries.UPDATE_PACIENTE)) {
+            preparedStatement.setString(1, paciente.getNombre());
+            preparedStatement.setDate(2, Date.valueOf(paciente.getFechaNacimiento()));
+            preparedStatement.setString(3, paciente.getTelefono());
+            preparedStatement.setLong(4, paciente.getId());
+
+            return preparedStatement.executeUpdate() > 0;
+        } catch (SQLException e) {
+            log.error("Se ha producido un error en la BD al actualizar paciente", e);
+            throw new DatabaseError(Constantes.DATABASE_ERROR);
+        }
+    }
+
+    @Override
+    public boolean delete(Long id) {
+        try (Connection connection = dbConnection.getConnection()) {
+            connection.setAutoCommit(false);
+            try (PreparedStatement deleteUsuario = connection.prepareStatement(SQLQueries.DELETE_USUARIO);
+                 PreparedStatement deletePaciente = connection.prepareStatement(SQLQueries.DELETE_PACIENTE)) {
+                deleteUsuario.setLong(1, id);
+                deleteUsuario.executeUpdate();
+                deletePaciente.setLong(1, id);
+                int affectedRows = deletePaciente.executeUpdate();
+                connection.commit();
+                return affectedRows > 0;
+            } catch (SQLException e) {
+                connection.rollback();
+                throw e;
+            } finally {
+                connection.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            log.error("Se ha producido un error en la BD al eliminar paciente", e);
             throw new DatabaseError(Constantes.DATABASE_ERROR);
         }
     }

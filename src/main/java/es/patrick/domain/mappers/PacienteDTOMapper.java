@@ -8,8 +8,7 @@ import es.patrick.domain.dto.PacienteDTOAlta;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PacienteDTOMapper
-{
+public class PacienteDTOMapper {
     public PacienteDTO toDTO(Paciente paciente) {
         return PacienteDTO.builder()
                 .id(paciente.getId())
@@ -20,7 +19,6 @@ public class PacienteDTOMapper
     }
 
     public Paciente toEntity(PacienteDTO pacienteDTO) {
-        // Completar
         return Paciente.builder()
                 .id(pacienteDTO.getId())
                 .nombre(pacienteDTO.getNombre())
@@ -29,7 +27,7 @@ public class PacienteDTOMapper
                 .build();
     }
 
-    public Paciente toEntity(PacienteDTOAlta pacienteDTO){
+    public Paciente toEntity(PacienteDTOAlta pacienteDTO) {
         return Paciente.builder()
                 .nombre(pacienteDTO.getNombre())
                 .fechaNacimiento(pacienteDTO.getFechaNacimiento())
@@ -42,10 +40,8 @@ public class PacienteDTOMapper
     }
 
     public List<PacienteDTO> toDTOList(List<Paciente> pacientes) {
-
         List<PacienteDTO> listaDtos = new ArrayList<>();
         pacientes.forEach(paciente -> listaDtos.add(toDTO(paciente)));
         return listaDtos;
     }
-
 }
